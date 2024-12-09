@@ -1,0 +1,41 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t iandrei250/react-example-image:latest .
+          docker push iandrei250/react-example-image:latest
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Configure gcloud
+        run: |
+          gcloud config set project react-docker-444217
+          gcloud config set run/region europe-west1
+
+      - name: Deploy to Google Cloud Run
+        run: |
+          gcloud run deploy react-docker-app --image docker.io/iandrei250/react-example-image:latest --platform managed --region europe-west1 --allow-unauthenticated
