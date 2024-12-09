@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20-alpine as build
 
 WORKDIR /react-docker-example/
 
@@ -8,4 +8,12 @@ COPY package.json /react-docker-example/
 
 RUN npm install
 
-CMD ["npm", "start"]
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=build /react-docker-example/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
