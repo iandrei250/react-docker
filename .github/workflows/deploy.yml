@@ -23,8 +23,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t iandrei250/react-example-image -f react-docker-example/Dockerfile react-docker-example/
-          docker push iandrei250/react-example-image
+          docker build -t iandrei250/react-example-image:v2 -f react-docker-example/Dockerfile react-docker-example/
+          docker push iandrei250/react-example-image:v2
 
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
@@ -38,4 +38,4 @@ jobs:
 
       - name: Deploy to Google Cloud Run
         run: |
-          gcloud run deploy react-docker-app --image docker.io/iandrei250/react-example-image --platform managed --region europe-west1 --allow-unauthenticated
+          gcloud run deploy react-docker-app --image docker.io/iandrei250/react-example-image:v2 --platform managed --region europe-west1 --allow-unauthenticated
